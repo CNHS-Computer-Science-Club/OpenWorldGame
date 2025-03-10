@@ -24,11 +24,8 @@ MAX_HEALTH = 100
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# World offset
-world_x, world_y = 0, 0
-
 # Player position in the world
-player_world_x, player_world_y = 0, 0
+block_x, block_y = 0, 0
 
 # Blocks
 blocks = [[400, 300], [600, 400], [200, 500]]
@@ -58,39 +55,39 @@ while True:
 
     # Get keys
     keys = pygame.key.get_pressed()
-    prev_x, prev_y = player_world_x, player_world_y
+    prev_x, prev_y = block_x, block_y
     
     # Move player in the world
     if keys[pygame.K_UP]:
-        player_world_y -= MOVE_SPEED
+        block_y -= MOVE_SPEED
     if keys[pygame.K_DOWN]:
-        player_world_y += MOVE_SPEED
+        block_y += MOVE_SPEED
     if keys[pygame.K_LEFT]:
-        player_world_x -= MOVE_SPEED
+        block_x -= MOVE_SPEED
     if keys[pygame.K_RIGHT]:
-        player_world_x += MOVE_SPEED
+        block_x += MOVE_SPEED
 
     # Player collision with blocks
     player_rect = pygame.Rect(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SQUARE_SIZE, SQUARE_SIZE)
     for block in blocks:
-        block_rect = pygame.Rect(block[0] - player_world_x + SCREEN_WIDTH // 2, block[1] - player_world_y + SCREEN_HEIGHT // 2, BLOCK_SIZE, BLOCK_SIZE)
+        block_rect = pygame.Rect(block[0] - block_x + SCREEN_WIDTH // 2, block[1] - block_y + SCREEN_HEIGHT // 2, BLOCK_SIZE, BLOCK_SIZE)
         if player_rect.colliderect(block_rect):
-            player_world_x, player_world_y = prev_x, prev_y
+            block_x, block_y = prev_x, prev_y
             break
 
     # Enemy movement
     for enemy in enemies:
-        if enemy[0] < player_world_x:
+        if enemy[0] < block_x:
             enemy[0] += ENEMY_SPEED
-        elif enemy[0] > player_world_x:
+        elif enemy[0] > block_x:
             enemy[0] -= ENEMY_SPEED
-        if enemy[1] < player_world_y:
+        if enemy[1] < block_y:
             enemy[1] += ENEMY_SPEED
-        elif enemy[1] > player_world_y:
+        elif enemy[1] > block_y:
             enemy[1] -= ENEMY_SPEED
         
         # Check collision with player
-        enemy_rect = pygame.Rect(enemy[0] - player_world_x + SCREEN_WIDTH // 2, enemy[1] - player_world_y + SCREEN_HEIGHT // 2, ENEMY_SIZE, ENEMY_SIZE)
+        enemy_rect = pygame.Rect(enemy[0] - block_x + SCREEN_WIDTH // 2, enemy[1] - block_y + SCREEN_HEIGHT // 2, ENEMY_SIZE, ENEMY_SIZE)
         if player_rect.colliderect(enemy_rect):
             health -= 1
             if health <= 0:
@@ -104,11 +101,11 @@ while True:
     
     # Draw blocks
     for block in blocks:
-        pygame.draw.rect(screen, BLOCK_COLOR, (block[0] - player_world_x + SCREEN_WIDTH // 2, block[1] - player_world_y + SCREEN_HEIGHT // 2, BLOCK_SIZE, BLOCK_SIZE))
+        pygame.draw.rect(screen, BLOCK_COLOR, (block[0] - block_x + SCREEN_WIDTH // 2, block[1] - block_y + SCREEN_HEIGHT // 2, BLOCK_SIZE, BLOCK_SIZE))
     
     # Draw enemies
     for enemy in enemies:
-        pygame.draw.rect(screen, ENEMY_COLOR, (enemy[0] - player_world_x + SCREEN_WIDTH // 2, enemy[1] - player_world_y + SCREEN_HEIGHT // 2, ENEMY_SIZE, ENEMY_SIZE))
+        pygame.draw.rect(screen, ENEMY_COLOR, (enemy[0] - block_x + SCREEN_WIDTH // 2, enemy[1] - block_y + SCREEN_HEIGHT // 2, ENEMY_SIZE, ENEMY_SIZE))
     
     # Draw health bar
     pygame.draw.rect(screen, (255, 0, 0), (20, 20, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT))
